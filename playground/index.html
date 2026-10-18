@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>comark-pele playground</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <h1>comark-pele <span>playground</span></h1>
+      <a href="https://pele.run" target="_blank" rel="noopener">pele.run</a>
+    </header>
+
+    <main class="columns">
+      <section class="column">
+        <div class="column-header">
+          <label for="markdown">Markdown</label>
+          <button id="reset" type="button">Reset</button>
+        </div>
+        <textarea id="markdown" spellcheck="false" autocomplete="off"></textarea>
+      </section>
+
+      <section class="column">
+        <div class="column-header">
+          <label for="renderer">Renderer</label>
+          <select id="renderer">
+            <option value="html">HTML</option>
+            <option value="vue">Vue</option>
+            <option value="react">React</option>
+            <option value="svelte">Svelte</option>
+            <option value="angular">Angular</option>
+            <option value="ansi">ANSI</option>
+            <option value="markdown">Markdown</option>
+          </select>
+          <span id="status" class="status" role="status"></span>
+        </div>
+        <div id="output" class="output"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
