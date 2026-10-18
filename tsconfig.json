@@ -22,8 +22,13 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
 
+    // Resolve the package to its source, so typechecking doesn't need a build.
+    // Keep in sync with the aliases in playground/vite.config.ts.
     "paths": {
       "comark-pele": ["./src/index.ts"],
+      "comark-pele/angular": ["./src/angular/index.ts"],
+      "comark-pele/svelte": ["./src/svelte/index.ts"],
+      "comark-pele/react": ["./src/react.tsx"],
       "comark-pele/*": ["./src/*.ts"]
     }
   },
