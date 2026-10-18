@@ -1,6 +1,6 @@
 {
   "name": "comark-pele",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Render Mermaid diagrams in Comark with Pele: a parse plugin plus components for HTML, ANSI, Vue, React, Svelte, and Angular",
   "keywords": [
     "comark",
