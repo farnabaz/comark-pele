@@ -25,7 +25,7 @@ component draws them. There is a component for every Comark renderer:
 ## Install
 
 ```bash
-pnpm add comark-pele pele
+pnpm add comark-pele
 ```
 
 ## Usage

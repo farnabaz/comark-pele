@@ -88,11 +88,13 @@
     "release": "release-it",
     "release:dry": "release-it --dry-run"
   },
+  "dependencies": {
+    "pele": "^1.5.0"
+  },
   "peerDependencies": {
     "@angular/common": ">=17.0.0",
     "@angular/core": ">=17.0.0",
     "comark": ">=0.7.0",
-    "pele": "^1.5.0",
     "react": ">=18.0.0",
     "svelte": "^5.20.0",
     "vue": "^3.5.0"
@@ -134,7 +136,6 @@
     "@types/react-dom": "^19.3.0",
     "comark": "^0.7.0",
     "happy-dom": "^21.0.3",
-    "pele": "^1.5.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "release-it": "^21.1.1",
