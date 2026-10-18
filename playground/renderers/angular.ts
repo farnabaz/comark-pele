@@ -4,13 +4,13 @@ import '@angular/compiler'
 import { createComponent, provideZonelessChangeDetection } from '@angular/core'
 import { createApplication } from '@angular/platform-browser'
 import { Markdown } from '@comark/angular'
-import pele, { Pele } from 'comark-pele/angular'
+import pele, { createPeleComponent } from 'comark-pele/angular'
 import type { MountRenderer } from './types.ts'
 
 const plugins = [pele()]
-const components = { Pele }
 
-const mount: MountRenderer = async (el, markdown) => {
+const mount: MountRenderer = async (el, markdown, options) => {
+  const components = { Pele: createPeleComponent(options) }
   const app = await createApplication({ providers: [provideZonelessChangeDetection()] })
   const hostElement = document.createElement('comark-markdown')
   el.append(hostElement)

@@ -127,6 +127,37 @@ textarea {
   tab-size: 2;
 }
 
+/* Options editor under the markdown editor */
+.column > .column-header + textarea + .column-header {
+  border-top: 1px solid var(--border);
+}
+
+textarea.options {
+  flex: 0 0 34%;
+  min-height: 140px;
+}
+
+.column-header .hint {
+  color: var(--muted);
+  font-weight: normal;
+}
+
+.column-header code {
+  font-size: 0.8125rem;
+}
+
+#options-status {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+#options-status + button {
+  margin-left: 0;
+}
+
 .output {
   flex: 1;
   overflow: auto;

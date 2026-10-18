@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { Component } from 'svelte'
   import { Markdown } from '@comark/svelte'
-  import pele, { Pele } from 'comark-pele/svelte'
+  import pele from 'comark-pele/svelte'
 
-  let { value }: { value: string } = $props()
+  let { value, Pele }: { value: string, Pele: Component<any> } = $props()
 
   const plugins = [pele()]
-  const components = { Pele }
+  const components = $derived({ Pele })
 </script>
 
 <Markdown {value} {plugins} {components} />

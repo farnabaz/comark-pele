@@ -1,10 +1,9 @@
 import { createHtmlRenderer } from '@comark/html'
-import pele, { Pele } from 'comark-pele/html'
+import pele, { createPeleComponent } from 'comark-pele/html'
 import type { MountRenderer } from './types.ts'
 
-const renderHtml = createHtmlRenderer({ plugins: [pele()], components: { Pele } })
-
-const mount: MountRenderer = async (el, markdown) => {
+const mount: MountRenderer = async (el, markdown, options) => {
+  const renderHtml = createHtmlRenderer({ plugins: [pele()], components: { Pele: createPeleComponent(options) } })
   const update = async (value: string) => {
     el.innerHTML = await renderHtml(value)
   }

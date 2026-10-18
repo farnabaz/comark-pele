@@ -240,7 +240,9 @@ pnpm play
 ```
 
 Opens a two-column playground: edit markdown on the left, and pick a renderer
-on the right (HTML, Vue, React, Svelte, Angular, ANSI, or Markdown). Each
+on the right (HTML, Vue, React, Svelte, Angular, ANSI, or Markdown). Under the
+markdown, edit Pele options as JSON; they're passed to `createPeleComponent()`
+and the renderer redraws. Each
 renderer uses the real Comark `Markdown` component of its framework with
 `comark-pele`, and is loaded only when selected. Use `?renderer=vue` in the URL
 to open a specific one.

@@ -1,3 +1,5 @@
+import type { MountOptions } from 'pele'
+
 /** A renderer mounted into the output panel. */
 export interface MountedRenderer {
   /** Render new markdown. */
@@ -6,4 +8,8 @@ export interface MountedRenderer {
   destroy(): void
 }
 
-export type MountRenderer = (el: HTMLElement, markdown: string) => MountedRenderer | Promise<MountedRenderer>
+/**
+ * Mount a renderer. `options` go to `createPeleComponent()`; the playground
+ * mounts again when they change.
+ */
+export type MountRenderer = (el: HTMLElement, markdown: string, options: MountOptions) => MountedRenderer | Promise<MountedRenderer>
