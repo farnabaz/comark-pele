@@ -7,10 +7,10 @@ import {
   PLATFORM_ID,
   Renderer2,
 } from '@angular/core'
-import type { OnChanges, OnDestroy } from '@angular/core'
+import type { OnChanges, OnDestroy, Type } from '@angular/core'
 import { isPlatformBrowser } from '@angular/common'
 import type { MountOptions } from 'pele'
-import { classNames, diagramInnerHtml, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from 'comark-pele/render'
+import { classNames, diagramInnerHtml, mergeOptions, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from 'comark-pele/render'
 import type { MountedDiagram } from 'comark-pele/render'
 
 let nextId = 0
@@ -61,6 +61,8 @@ export class Pele implements OnChanges, OnDestroy {
   private readonly renderer = inject(Renderer2)
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID))
   private readonly idPrefix = `pele-ng${nextId++}`
+  /** Default options, set by `createPeleComponent(options)`. */
+  protected defaults?: MountOptions
   private wrapper?: HTMLElement
   private mounted?: MountedDiagram
 
@@ -76,7 +78,7 @@ export class Pele implements OnChanges, OnDestroy {
 
     // First render, on the server or in the browser: the SVG, or the escaped
     // source when the diagram can't be drawn.
-    const rendered = renderDiagram(this.content, { idPrefix: this.idPrefix, ...this.options })
+    const rendered = renderDiagram(this.content, mergeOptions({ idPrefix: this.idPrefix }, this.defaults, this.options))
     this.renderer.setProperty(wrapper, 'innerHTML', diagramInnerHtml(rendered, this.content))
     this.setAttribute('data-diagram', rendered.result?.type)
     this.setAttribute('data-error', rendered.error?.message)
@@ -103,19 +105,48 @@ export class Pele implements OnChanges, OnDestroy {
   }
 
   private mountOptions(): MountOptions {
-    const options = this.options
-    return {
-      idPrefix: this.idPrefix,
-      ...options,
+    return mergeOptions({ idPrefix: this.idPrefix }, this.defaults, this.options, {
       onRender: (result) => {
         this.setAttribute('data-diagram', result.type)
         this.setAttribute('data-error', undefined)
-        options?.onRender?.(result)
       },
       onError: (error) => {
         this.setAttribute('data-error', toErrorInfo(error).message)
-        options?.onError?.(error)
       },
-    }
+    })
   }
+}
+
+/**
+ * Create the Angular component for `pele` nodes with default
+ * [Pele options](https://pele.run/api#mount), such as `zoom`, `fontSize`,
+ * `icons`, or `onRender`. A component's own `options` input is merged on top.
+ *
+ * @example
+ * ```ts
+ * import { Markdown } from '@comark/angular'
+ * import pele, { createPeleComponent } from 'comark-pele/angular'
+ *
+ * @Component({
+ *   imports: [Markdown],
+ *   template: `<comark-markdown [value]="content" [plugins]="plugins" [components]="components" />`,
+ * })
+ * export class AppComponent {
+ *   plugins = [pele()]
+ *   components = { Pele: createPeleComponent({ zoom: false, fontSize: 14 }) }
+ * }
+ * ```
+ */
+export function createPeleComponent(options?: MountOptions): Type<Pele> {
+  @Component({
+    selector: 'comark-pele',
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    template: '',
+    host: { ngSkipHydration: 'true', style: 'display: block' },
+  })
+  class ConfiguredPele extends Pele {
+    protected override defaults = options
+  }
+  return ConfiguredPele
 }

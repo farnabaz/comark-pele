@@ -103,8 +103,8 @@ const html = await renderHtml(content)
 // <div class="pele-diagram" data-diagram="flowchart"><svg class="pele pele-flowchart" ...>...</svg></div>
 ```
 
-Use `createPele(options)` instead of `Pele` to pass [Pele render options](https://pele.run/api#renderoptions),
-for example `createPele({ fontSize: 14 })`.
+To pass [Pele render options](https://pele.run/api#renderoptions), see
+[Pele options](#pele-options).
 
 ### ANSI
 
@@ -175,6 +175,36 @@ switch to Pele's `mount()`, which:
 The wrapper is `div.pele-diagram`, with `data-diagram` set to the diagram type
 and `data-error` set to the message when the source can't be drawn. Before
 the browser takes over, an invalid diagram shows its source in `pre.pele-source`.
+
+## Pele options
+
+Every renderer that draws SVG exports `createPeleComponent(options)`, which
+returns a `Pele` component with default [Pele options](https://pele.run/api#renderoptions):
+
+```ts
+import pele, { createPeleComponent } from 'comark-pele/vue'
+// or 'comark-pele/html', '/react', '/svelte', '/angular'
+
+const Pele = createPeleComponent({
+  zoom: false,                  // no zoom controls
+  fontSize: 14,
+  autoDirection: false,         // keep `flowchart LR` horizontal on narrow screens
+  icons: name => myIcons[name], // SVG for icons such as `fa:fa-car`
+  onRender: result => console.log(result.type, result.links),
+})
+```
+
+Then pass it like the default component: `components: { Pele }`. `Pele` itself
+is `createPeleComponent()`.
+
+- Call it once, outside templates and render functions, so the component
+  type stays the same between renders.
+- A component's own `options` prop is merged on top. `onRender` and
+  `onError` from both are called.
+- The HTML renderer only uses render options. `zoom`, `onRender` and
+  `onError` apply in the browser, where the components use `mount()`.
+- Mermaid settings such as themes go in the diagram itself, with frontmatter
+  or a `%%{init}%%` directive.
 
 ## Theming
 

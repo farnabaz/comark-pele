@@ -21,20 +21,20 @@ function attributes(values: Record<string, string | undefined>): string {
 }
 
 /**
- * Create an HTML component for `pele` nodes with custom Pele render options.
+ * Create the HTML component for `pele` nodes with [Pele render options](https://pele.run/api#renderoptions).
  *
  * @example
  * ```ts
  * import { createHtmlRenderer } from '@comark/html'
- * import pele, { createPele } from 'comark-pele/html'
+ * import pele, { createPeleComponent } from 'comark-pele/html'
  *
  * const renderHtml = createHtmlRenderer({
  *   plugins: [pele()],
- *   components: { Pele: createPele({ fontSize: 14 }) },
+ *   components: { Pele: createPeleComponent({ fontSize: 14 }) },
  * })
  * ```
  */
-export function createPele(options: RenderOptions = {}) {
+export function createPeleComponent(options: RenderOptions = {}) {
   return ([, attrs]: ElementNode): string => {
     const { content: rawContent, class: className } = attrs as PeleNodeAttributes
     const content = String(rawContent ?? '')
@@ -71,4 +71,7 @@ export function createPele(options: RenderOptions = {}) {
  * })
  * ```
  */
-export const Pele = createPele()
+export const Pele = createPeleComponent()
+
+/** @deprecated Use `createPeleComponent(options)`. */
+export const createPele = createPeleComponent

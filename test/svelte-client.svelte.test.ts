@@ -2,7 +2,7 @@
 import { flushSync, mount, unmount } from 'svelte'
 import { describe, expect, it } from 'vitest'
 import './dom.ts'
-import { Pele } from '../src/svelte/index.ts'
+import { createPeleComponent, Pele } from '../src/svelte/index.ts'
 
 describe('svelte component (browser)', () => {
   it('mounts with Pele and updates when the content changes', () => {
@@ -42,6 +42,20 @@ describe('svelte component (browser)', () => {
     flushSync()
     expect(el.querySelector('svg.pele-flowchart')).not.toBeNull()
     expect(el.hasAttribute('data-error')).toBe(false)
+    unmount(component)
+  })
+
+  it('stays reactive with createPeleComponent and calls its onRender', () => {
+    const target = document.createElement('div')
+    const rendered: string[] = []
+    const props = $state({ content: 'flowchart LR\n  A --> B\n' })
+    const component = mount(createPeleComponent({ onRender: result => rendered.push(result.type) }), { target, props })
+    flushSync()
+
+    props.content = 'pie\n  "Dogs": 3\n'
+    flushSync()
+    expect(target.querySelector('.pele-diagram svg.pele-pie')).not.toBeNull()
+    expect(rendered).toEqual(['flowchart', 'pie'])
     unmount(component)
   })
 })

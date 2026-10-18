@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import './dom.ts'
 import { createApp, h, nextTick, reactive, Suspense } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import pele, { Pele } from '../src/vue.ts'
+import pele, { createPeleComponent, Pele } from '../src/vue.ts'
 
 const flowchart = 'flowchart LR\n  A[Start] --> B[End]\n'
 
@@ -64,6 +64,24 @@ describe('vue component', () => {
     await nextTick()
     expect(el.querySelector('svg.pele-flowchart')).not.toBeNull()
     expect(el.hasAttribute('data-error')).toBe(false)
+    app.unmount()
+  })
+
+  it('applies options from createPeleComponent, with the options prop on top', async () => {
+    const Fixed = createPeleComponent({ responsive: false })
+    expect(await renderToString(h(Fixed, { content: flowchart }))).not.toContain('max-width:100%')
+    expect(await renderToString(h(Fixed, { content: flowchart, options: { responsive: true } }))).toContain('max-width:100%')
+    expect(await renderToString(h(Pele, { content: flowchart }))).toContain('max-width:100%')
+  })
+
+  it('calls onRender from createPeleComponent in the browser', async () => {
+    const rendered: string[] = []
+    const Configured = createPeleComponent({ onRender: result => rendered.push(result.type) })
+    const root = document.createElement('div')
+    const app = createApp({ render: () => h(Configured, { content: flowchart }) })
+    app.mount(root)
+    await nextTick()
+    expect(rendered).toEqual(['flowchart'])
     app.unmount()
   })
 })

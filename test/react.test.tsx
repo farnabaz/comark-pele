@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import './dom.ts'
-import pele, { Pele } from '../src/react.tsx'
+import pele, { createPeleComponent, Pele } from '../src/react.tsx'
 
 const flowchart = 'flowchart LR\n  A[Start] --> B[End]\n'
 
@@ -62,5 +62,12 @@ describe('react component', () => {
     expect(el.querySelector('svg.pele-flowchart')).not.toBeNull()
     expect(el.hasAttribute('data-error')).toBe(false)
     await act(() => root.unmount())
+  })
+
+  it('applies options from createPeleComponent, with the options prop on top', () => {
+    const Fixed = createPeleComponent({ responsive: false })
+    expect(renderToString(<Fixed content={flowchart} />)).not.toContain('max-width:100%')
+    expect(renderToString(<Fixed content={flowchart} options={{ responsive: true }} />)).toContain('max-width:100%')
+    expect(renderToString(<Pele content={flowchart} />)).toContain('max-width:100%')
   })
 })

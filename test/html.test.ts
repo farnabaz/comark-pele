@@ -1,6 +1,6 @@
 import { createHtmlRenderer } from '@comark/html'
 import { describe, expect, it } from 'vitest'
-import pele, { createPele, Pele } from '../src/html.ts'
+import pele, { createPele, createPeleComponent, Pele } from '../src/html.ts'
 
 const renderHtml = createHtmlRenderer({ plugins: [pele()], components: { Pele } })
 
@@ -37,5 +37,13 @@ describe('html component', () => {
     })
     const html = await render('```mermaid\nflowchart LR\n  A --> B\n```')
     expect(html).not.toContain('max-width:100%')
+  })
+
+  it('accepts render options with createPeleComponent', async () => {
+    const render = createHtmlRenderer({ plugins: [pele()], components: { Pele: createPeleComponent({ responsive: false }) } })
+    const html = await render('```mermaid\nflowchart LR\n  A --> B\n```')
+    expect(html).toContain('<svg')
+    expect(html).not.toContain('max-width:100%')
+    expect(createPele).toBe(createPeleComponent)
   })
 })

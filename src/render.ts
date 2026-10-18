@@ -43,6 +43,27 @@ export function toErrorInfo(error: unknown): PeleDiagramError {
   return { message: error instanceof Error ? error.message : String(error) }
 }
 
+/**
+ * Merge Pele options. Later sources win, except `onRender` and `onError`:
+ * the callbacks from every source are called, in order.
+ */
+export function mergeOptions(...sources: (MountOptions | null | undefined)[]): MountOptions {
+  const merged: MountOptions = {}
+  const onRender: NonNullable<MountOptions['onRender']>[] = []
+  const onError: NonNullable<MountOptions['onError']>[] = []
+  for (const source of sources) {
+    if (!source) continue
+    Object.assign(merged, source)
+    if (source.onRender) onRender.push(source.onRender)
+    if (source.onError) onError.push(source.onError)
+  }
+  if (onRender.length) merged.onRender = result => onRender.forEach(callback => callback(result))
+  else delete merged.onRender
+  if (onError.length) merged.onError = error => onError.forEach(callback => callback(error))
+  else delete merged.onError
+  return merged
+}
+
 /** Render a diagram with Pele without throwing. */
 export function renderDiagram(content: string, options?: RenderOptions): RenderDiagramResult {
   try {

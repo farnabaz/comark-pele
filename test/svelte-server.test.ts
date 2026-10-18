@@ -1,7 +1,7 @@
 import { parseMarkdown } from 'comark'
 import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
-import pele, { Pele } from '../src/svelte/index.ts'
+import pele, { createPeleComponent, Pele } from '../src/svelte/index.ts'
 
 const flowchart = 'flowchart LR\n  A[Start] --> B[End]\n'
 
@@ -20,5 +20,12 @@ describe('svelte component (server)', () => {
     const { body } = render(Pele, { props: { content: '<b>nope</b>' } })
     expect(body).toContain('data-error="No diagram type detected')
     expect(body).toContain('<pre class="pele-source"><code>&lt;b&gt;nope&lt;/b&gt;</code></pre>')
+  })
+
+  it('applies options from createPeleComponent, with the options prop on top', () => {
+    const Fixed = createPeleComponent({ responsive: false })
+    expect(render(Fixed, { props: { content: flowchart } }).body).not.toContain('max-width:100%')
+    expect(render(Fixed, { props: { content: flowchart, options: { responsive: true } } }).body).toContain('max-width:100%')
+    expect(render(Pele, { props: { content: flowchart } }).body).toContain('max-width:100%')
   })
 })

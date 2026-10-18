@@ -1,21 +1,21 @@
 // @vitest-environment happy-dom
 import '@angular/compiler'
 import { createComponent, PLATFORM_ID, provideZonelessChangeDetection } from '@angular/core'
-import type { ApplicationRef } from '@angular/core'
+import type { ApplicationRef, Type } from '@angular/core'
 import { createApplication } from '@angular/platform-browser'
 import { describe, expect, it } from 'vitest'
 import './dom.ts'
-import { Pele } from '../src/angular/index.ts'
+import { createPeleComponent, Pele } from '../src/angular/index.ts'
 
 const flowchart = 'flowchart LR\n  A[Start] --> B[End]\n'
 
-async function setup(platform: 'browser' | 'server', inputs: Record<string, unknown>) {
+async function setup(platform: 'browser' | 'server', inputs: Record<string, unknown>, component: Type<Pele> = Pele) {
   const app: ApplicationRef = await createApplication({
     providers: [provideZonelessChangeDetection(), { provide: PLATFORM_ID, useValue: platform }],
   })
   const hostElement = document.createElement('comark-pele')
   document.body.append(hostElement)
-  const ref = createComponent(Pele, { environmentInjector: app.injector, hostElement })
+  const ref = createComponent(component, { environmentInjector: app.injector, hostElement })
   for (const [key, value] of Object.entries(inputs)) ref.setInput(key, value)
   app.attachView(ref.hostView)
   ref.changeDetectorRef.detectChanges()
@@ -67,6 +67,25 @@ describe('angular component', () => {
     ref.changeDetectorRef.detectChanges()
     expect(el.querySelector('svg.pele-flowchart')).not.toBeNull()
     expect(el.hasAttribute('data-error')).toBe(false)
+    app.destroy()
+  })
+
+  it('applies options from createPeleComponent, with the options input on top', async () => {
+    const Fixed = createPeleComponent({ responsive: false })
+    const fixed = await setup('server', { content: flowchart }, Fixed)
+    expect(fixed.hostElement.innerHTML).toContain('<svg')
+    expect(fixed.hostElement.innerHTML).not.toContain('max-width:100%')
+    fixed.app.destroy()
+
+    const overridden = await setup('server', { content: flowchart, options: { responsive: true } }, Fixed)
+    expect(overridden.hostElement.innerHTML).toContain('max-width:100%')
+    overridden.app.destroy()
+  })
+
+  it('calls onRender from createPeleComponent in the browser', async () => {
+    const rendered: string[] = []
+    const { app } = await setup('browser', { content: flowchart }, createPeleComponent({ onRender: result => rendered.push(result.type) }))
+    expect(rendered).toEqual(['flowchart'])
     app.destroy()
   })
 })

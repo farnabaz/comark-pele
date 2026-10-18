@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { HTMLAttributes } from 'react'
 import type { MountOptions } from 'pele'
-import { classNames, diagramInnerHtml, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from './render.ts'
+import { classNames, diagramInnerHtml, mergeOptions, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from './render.ts'
 import type { MountedDiagram } from './render.ts'
 
 export { default, searchProps } from './index.ts'
@@ -15,6 +15,83 @@ export interface PeleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content
   language?: string
   /** Options passed to Pele's `render()` and, in the browser, `mount()`. */
   options?: MountOptions
+}
+
+/**
+ * Create the React component for `pele` nodes with default
+ * [Pele options](https://pele.run/api#mount), such as `zoom`, `fontSize`,
+ * `icons`, or `onRender`. A component's own `options` prop is merged on top.
+ *
+ * Call it once, outside components, so the component type stays stable.
+ *
+ * @example
+ * ```tsx
+ * import pele, { createPeleComponent } from 'comark-pele/react'
+ *
+ * const Pele = createPeleComponent({ zoom: false, fontSize: 14 })
+ * // <Markdown components={{ Pele }} plugins={[pele()]}>{content}</Markdown>
+ * ```
+ */
+export function createPeleComponent(defaults?: MountOptions) {
+  return function Pele({ content, language: _language, options, className, ...rest }: PeleProps) {
+    const ref = useRef<HTMLDivElement>(null)
+    const mounted = useRef<MountedDiagram | undefined>(undefined)
+    const id = useId().replace(/[^\w-]/g, '')
+
+    // Rendered once. React only patches `innerHTML` when `__html` changes, so
+    // after `mount()` Pele owns the element's children.
+    const [initial] = useState(() => {
+      const rendered = renderDiagram(content, { idPrefix: `pele-${id}`, ...mergeOptions(defaults, options) })
+      return { rendered, html: { __html: diagramInnerHtml(rendered, content) } }
+    })
+    const [type, setType] = useState(initial.rendered.result?.type)
+    const [error, setError] = useState(initial.rendered.error?.message)
+
+    const latestOptions = useRef(options)
+    latestOptions.current = options
+
+    const mountOptions = (): MountOptions => mergeOptions(defaults, latestOptions.current, {
+      onRender(result) {
+        setType(result.type)
+        setError(undefined)
+      },
+      onError(err) {
+        setError(toErrorInfo(err).message)
+      },
+    })
+
+    useEffect(() => {
+      if (!ref.current) return
+      mounted.current = mountDiagram(ref.current, content, mountOptions())
+      return () => {
+        mounted.current?.destroy()
+        mounted.current = undefined
+      }
+      // Mount once; later changes go through `update()` below.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const isFirstRun = useRef(true)
+    useEffect(() => {
+      if (isFirstRun.current) {
+        isFirstRun.current = false
+        return
+      }
+      mounted.current?.update(content, mountOptions())
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [content, options])
+
+    return (
+      <div
+        {...rest}
+        ref={ref}
+        className={classNames(WRAPPER_CLASS, className)}
+        data-diagram={type}
+        data-error={error}
+        dangerouslySetInnerHTML={initial.html}
+      />
+    )
+  }
 }
 
 /**
@@ -32,65 +109,4 @@ export interface PeleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content
  * <Markdown components={{ Pele }} plugins={[pele()]}>{content}</Markdown>
  * ```
  */
-export function Pele({ content, language: _language, options, className, ...rest }: PeleProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const mounted = useRef<MountedDiagram | undefined>(undefined)
-  const id = useId().replace(/[^\w-]/g, '')
-
-  // Rendered once. React only patches `innerHTML` when `__html` changes, so
-  // after `mount()` Pele owns the element's children.
-  const [initial] = useState(() => {
-    const rendered = renderDiagram(content, { idPrefix: `pele-${id}`, ...options })
-    return { rendered, html: { __html: diagramInnerHtml(rendered, content) } }
-  })
-  const [type, setType] = useState(initial.rendered.result?.type)
-  const [error, setError] = useState(initial.rendered.error?.message)
-
-  const latestOptions = useRef(options)
-  latestOptions.current = options
-
-  const mountOptions = (): MountOptions => ({
-    ...latestOptions.current,
-    onRender(result) {
-      setType(result.type)
-      setError(undefined)
-      latestOptions.current?.onRender?.(result)
-    },
-    onError(err) {
-      setError(toErrorInfo(err).message)
-      latestOptions.current?.onError?.(err)
-    },
-  })
-
-  useEffect(() => {
-    if (!ref.current) return
-    mounted.current = mountDiagram(ref.current, content, mountOptions())
-    return () => {
-      mounted.current?.destroy()
-      mounted.current = undefined
-    }
-    // Mount once; later changes go through `update()` below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const isFirstRun = useRef(true)
-  useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false
-      return
-    }
-    mounted.current?.update(content, mountOptions())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, options])
-
-  return (
-    <div
-      {...rest}
-      ref={ref}
-      className={classNames(WRAPPER_CLASS, className)}
-      data-diagram={type}
-      data-error={error}
-      dangerouslySetInnerHTML={initial.html}
-    />
-  )
-}
+export const Pele = createPeleComponent()

@@ -19,7 +19,7 @@ enables zoom, and shows errors.
 <script lang="ts">
   import { onMount, untrack } from 'svelte'
   import type { MountOptions } from 'pele'
-  import { classNames, diagramInnerHtml, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from 'comark-pele/render'
+  import { classNames, diagramInnerHtml, mergeOptions, mountDiagram, renderDiagram, toErrorInfo, WRAPPER_CLASS } from 'comark-pele/render'
   import type { MountedDiagram } from 'comark-pele/render'
 
   let {
@@ -27,12 +27,15 @@ enables zoom, and shows errors.
     language: _language,
     class: className = '',
     options,
+    defaults,
     ...rest
   }: {
     content: string
     language?: string
     class?: string
     options?: MountOptions
+    /** Set by `createPeleComponent(options)`. */
+    defaults?: MountOptions
     [key: string]: unknown
   } = $props()
 
@@ -40,7 +43,7 @@ enables zoom, and shows errors.
 
   // Rendered once. The `{@html}` below never changes, so after `mount()` Pele
   // owns the element's children.
-  const initial = untrack(() => renderDiagram(content, { idPrefix: `pele-${uid}`, ...options }))
+  const initial = untrack(() => renderDiagram(content, { idPrefix: `pele-${uid}`, ...mergeOptions(defaults, options) }))
   const html = untrack(() => diagramInnerHtml(initial, content))
 
   let type = $state(initial.result?.type)
@@ -50,18 +53,15 @@ enables zoom, and shows errors.
   let mounted: MountedDiagram | undefined
 
   function mountOptions(): MountOptions {
-    return {
-      ...options,
+    return mergeOptions(defaults, options, {
       onRender(result) {
         type = result.type
         error = undefined
-        options?.onRender?.(result)
       },
       onError(err) {
         error = toErrorInfo(err).message
-        options?.onError?.(err)
       },
-    }
+    })
   }
 
   onMount(() => {
@@ -77,6 +77,7 @@ enables zoom, and shows errors.
     // Track the inputs. The first run happens right after `mount()`, so skip it.
     const next = content
     void options
+    void defaults
     if (firstRun) {
       firstRun = false
       return
