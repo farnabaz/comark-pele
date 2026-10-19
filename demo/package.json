@@ -1,0 +1,24 @@
+{
+  "name": "comark-pele-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@comark/vue": "0.7.0",
+    "comark": "^0.7.0",
+    "comark-pele": "workspace:*",
+    "nuxt": "^4.6.2",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "vue-tsc": "^3.3.13"
+  }
+}

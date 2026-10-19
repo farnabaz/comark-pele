@@ -88,6 +88,9 @@ export function createPeleComponent(defaults?: MountOptions) {
         className={classNames(WRAPPER_CLASS, className)}
         data-diagram={type}
         data-error={error}
+        // In the browser Pele measures text with the real fonts, so the SVG
+        // can differ from the server's. `mount()` redraws it either way.
+        suppressHydrationWarning
         dangerouslySetInnerHTML={initial.html}
       />
     )

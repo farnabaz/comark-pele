@@ -1,0 +1,396 @@
+/* ---------------------------------------------------------------------------
+   Theme tokens
+   --------------------------------------------------------------------------- */
+
+:root {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.205 0 0);
+  --muted: oklch(0.52 0 0);
+  --faint: oklch(0.82 0 0);
+  --surface: oklch(0.955 0 0);
+  --surface-alt: oklch(0.92 0 0);
+  --border: oklch(0.205 0 0 / 0.18);
+  --frame: oklch(0.205 0 0 / 0.28);
+  --accent: oklch(0.52 0.15 35);
+  --critical: oklch(0.55 0.2 25);
+
+  color-scheme: light;
+}
+
+.dark {
+  --background: oklch(0.11 0 0);
+  --foreground: oklch(0.88 0 0);
+  --muted: oklch(0.6 0 0);
+  --faint: oklch(0.3 0 0);
+  --surface: oklch(0.17 0 0);
+  --surface-alt: oklch(0.22 0 0);
+  --border: oklch(0.4 0 0);
+  --frame: oklch(0.48 0 0);
+  --accent: oklch(0.76 0.14 50);
+  --critical: oklch(0.68 0.18 25);
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   Pele reads these when it draws, and the SVG uses them as CSS variables, so
+   switching the theme recolors every diagram without drawing it again.
+   --------------------------------------------------------------------------- */
+
+.pele {
+  --pele-bg: var(--background);
+  --pele-fg: var(--foreground);
+  --pele-muted: var(--muted);
+  --pele-line: var(--foreground);
+  --pele-surface: var(--surface);
+  --pele-surface-alt: var(--surface-alt);
+  --pele-border: var(--border);
+  --pele-accent: var(--accent);
+  --pele-critical: var(--critical);
+  --pele-error: var(--critical);
+  --pele-font: var(--font-sans);
+  --pele-font-mono: var(--font-mono);
+  --pele-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Shell
+   --------------------------------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+button {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--background);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.dark .only-light,
+:root:not(.dark) .only-dark {
+  display: none;
+}
+
+/* Dashed borders, drawn with gradients so the dash length is the same everywhere. */
+.frame,
+.pele-diagram {
+  background-image:
+    repeating-linear-gradient(to right, var(--frame) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(to bottom, var(--frame) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(to right, var(--frame) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(to bottom, var(--frame) 0 2px, transparent 2px 7px);
+  background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+  background-position: 0 0, 100% 0, 0 100%, 0 0;
+  background-size: 100% 1px, 1px 100%, 100% 1px, 1px 100%;
+}
+
+.rule,
+.prose hr {
+  height: 1px;
+  border: 0;
+  background-image: repeating-linear-gradient(to right, var(--frame) 0 2px, transparent 2px 7px);
+}
+
+.site-header,
+.site-main {
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding-inline: 1.25rem;
+}
+
+.site-header {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+.site-main {
+  padding-bottom: 6rem;
+}
+
+.site-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+
+.nav-link,
+.tab {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.nav-link:hover,
+.tab:not(:disabled):hover,
+.tab[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.separator {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--frame);
+}
+
+.counter {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress {
+  height: 6px;
+  margin-bottom: 3rem;
+}
+
+.progress > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+
+.intro {
+  margin-bottom: 3rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Source pane
+   --------------------------------------------------------------------------- */
+
+.source {
+  margin: 0;
+  padding: 1.75rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+}
+
+.source-line {
+  display: block;
+  white-space: pre;
+}
+
+.source-number {
+  display: inline-block;
+  margin-right: 1rem;
+  text-align: right;
+  color: var(--faint);
+  user-select: none;
+}
+
+.source-fence { color: var(--accent); }
+.source-diagram { color: var(--foreground); }
+.source-frontmatter { color: var(--muted); }
+.source-heading { color: var(--foreground); font-weight: 500; }
+.source-text { color: color-mix(in oklch, var(--foreground) 70%, transparent); }
+
+/* ---------------------------------------------------------------------------
+   Prose around the diagrams
+   --------------------------------------------------------------------------- */
+
+.prose > * + * {
+  margin-top: 1.5rem;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h1 {
+  margin-bottom: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 4vw, 1.875rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.prose h2 {
+  margin-top: 4rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.prose h3 {
+  margin-top: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 1rem;
+}
+
+.prose p,
+.prose li {
+  max-width: 68ch;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose code {
+  padding: 0.1em 0.35em;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.prose pre {
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  border: 1px dashed var(--frame);
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+}
+
+.prose hr {
+  margin: 3rem 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Diagrams. The wrapper is `div.pele-diagram`; `{.wide}` on the fence adds
+   the `wide` class.
+   --------------------------------------------------------------------------- */
+
+.pele-diagram {
+  position: relative;
+}
+
+.prose .pele-diagram {
+  margin-block: 2.5rem;
+  padding: 1.5rem;
+}
+
+/* The diagram type, as a label on the frame. */
+.pele-diagram[data-diagram]::before {
+  content: '[ ' attr(data-diagram) ' ]';
+  position: absolute;
+  top: 0;
+  left: 1.25rem;
+  transform: translateY(-50%);
+  padding-inline: 0.5rem;
+  background: var(--background);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.pele-diagram svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.pele-diagram.wide {
+  --bleed: min(8rem, calc((100vw - 100%) / 2 - 1.25rem));
+  margin-inline: calc(var(--bleed) * -1);
+}
+
+.pele-source {
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+}

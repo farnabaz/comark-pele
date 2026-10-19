@@ -80,6 +80,8 @@
     "dev": "tsdown --watch",
     "play": "vite --config playground/vite.config.ts",
     "play:build": "vite build --config playground/vite.config.ts",
+    "demo": "pnpm --filter comark-pele-demo dev",
+    "demo:build": "pnpm --filter comark-pele-demo build",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && svelte-check --tsconfig ./tsconfig.json --threshold error",
