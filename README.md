@@ -8,6 +8,9 @@
 Render Mermaid diagrams in [Comark](https://comark.dev) with
 [Pele](https://pele.run), a small, fast renderer that outputs themeable SVG.
 
+**[Live demo](https://comark-pele-demo.vercel.app)**: a design doc, every
+diagram type Pele supports, and diagrams redrawn as Markdown streams in.
+
 It works like Comark's built-in [mermaid plugin](https://comark.dev/plugins/built-in/mermaid):
 the plugin turns ` ```mermaid ` code blocks into `pele` nodes, and a `Pele`
 component draws them. There is a component for every Comark renderer:

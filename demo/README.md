@@ -2,7 +2,7 @@
 
 Mermaid diagrams written in **plain `.md` files**, parsed by
 [Comark](https://comark.dev) and drawn by [Pele](https://pele.run) through
-`comark-pele`. A Nuxt app, modeled on
+`comark-pele`. Live at <https://comark-pele-demo.vercel.app>. A Nuxt app, modeled on
 [comark-graphs-demo](https://comark-graphs-demo.vercel.app/).
 
 | Route        | What it shows |
